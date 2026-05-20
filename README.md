@@ -230,3 +230,25 @@ A **Parameter Variation** experiment sweeps `warehouseCapacity` from 10 to 200 (
 - **Warehouse as a plain list, not a Queue block.** Because the selector must freely scan and pick the smallest `plannedGlobalSeq` (not strictly FIFO), the warehouse is an `ArrayList`, not an AnyLogic Queue.
 - **Delay capacity = 1.** The paint booth is serial — one vehicle at a time.
 - **Paint duration unit must be MINUTE** — the duration fields are in minutes; a wrong unit silently breaks throughput.
+
+## 13. Results
+
+The capacity sweep (10 → 200 spaces, step 2) produces a clear U-shaped cost curve. The full per-capacity numbers are in [`results/results_table.csv`](results/results_table.csv).
+
+### Total cost vs capacity
+
+![Total cost curve](results/total_cost_curve.png)
+
+Total cost falls steeply as capacity grows (less body-shop blocking), reaches its minimum at **68 spaces (€1,020,000)**, then rises linearly as extra empty parking adds pure CAPEX.
+
+### Selected results
+
+| Capacity | Blocked | Downtime (€) | CAPEX (€) | Total (€) |
+|---|---|---|---|---|
+| 10 | 19,649 | 713,910,399 | 150,000 | 714,060,399 |
+| 30 | 2,301 | 86,429,533 | 450,000 | 86,879,533 |
+| 50 | 122 | 5,347,510 | 750,000 | 6,097,510 |
+| 66 | 2 | 5,733 | 990,000 | 995,733 |
+| **68** | **0** | **0** | **1,020,000** | **1,020,000** ⭐ |
+| 100 | 0 | 0 | 1,500,000 | 1,500,000 |
+| 200 | 0 | 0 | 3,000,000 | 3,000,000 |
