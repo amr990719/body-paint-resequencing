@@ -1,0 +1,84 @@
+<div style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 8px; font-size: 12px; color: var(--color-text-secondary);">
+  <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 16px; height: 3px; background: #534AB7;"></span>Total cost</span>
+  <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 16px; height: 3px; background: #1D9E75; border-top: 1px dashed #1D9E75;"></span>CAPEX</span>
+  <span style="display: flex; align-items: center; gap: 4px;"><span style="width: 16px; height: 3px; background: #D85A30; border-top: 1px dashed #D85A30;"></span>Downtime cost</span>
+  <span style="display: flex; align-items: center; gap: 4px; margin-left: auto;"><span style="width: 2px; height: 14px; background: #888;"></span>Optimum (cap=68, €1.02M)</span>
+</div>
+
+<div style="position: relative; width: 100%; height: 400px;">
+  <canvas id="combChart" role="img" aria-label="Combined line chart showing total cost, CAPEX, and downtime cost versus warehouse capacity from 10 to 200, stepped by 2. No dots — clean lines only. A vertical grey line at capacity 68 marks the optimum where total cost equals 1.02 million euros.">Three cost curves with vertical line marking the optimum at capacity 68.</canvas>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const cap = [10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,84,86,88,90,92,94,96,98,100,102,104,106,108,110,112,114,116,118,120,122,124,126,128,130,132,134,136,138,140,142,144,146,148,150,152,154,156,158,160,162,164,166,168,170,172,174,176,178,180,182,184,186,188,190,192,194,196,198,200];
+const downtime = [713910399,601722868,502376843,426238126,353330994,284036874,223203807,176282647,137949478,109799415,86429533,67229899,51038531,40178891,32970819,24748683,18308011,13351651,9734224,6486244,5347510,4783615,4278648,3530943,2663695,1848337,1364736,703883,5733,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+const capex = cap.map(c => c * 15000);
+const total = cap.map((c,i) => capex[i] + downtime[i]);
+
+const fmt = v => {
+  if (v >= 1e9) return '€' + (v/1e9).toFixed(2) + 'B';
+  if (v >= 1e6) return '€' + (v/1e6).toFixed(1) + 'M';
+  if (v >= 1e3) return '€' + (v/1e3).toFixed(0) + 'k';
+  return '€0';
+};
+const log = a => a.map(v => v <= 0 ? 1 : v);
+
+// Custom plugin to draw a vertical line at cap = 68
+const optimumLinePlugin = {
+  id: 'optimumLine',
+  afterDraw(chart) {
+    const optIdx = cap.indexOf(68);
+    if (optIdx < 0) return;
+    const {ctx, chartArea, scales: {x, y}} = chart;
+    const xPos = x.getPixelForValue(optIdx);
+    ctx.save();
+    ctx.strokeStyle = '#888';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(xPos, chartArea.top);
+    ctx.lineTo(xPos, chartArea.bottom);
+    ctx.stroke();
+    // label
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#555';
+    ctx.font = '600 11px system-ui, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('cap = 68', xPos + 6, chartArea.top + 14);
+    ctx.fillText('€1.02M', xPos + 6, chartArea.top + 28);
+    ctx.restore();
+  }
+};
+
+new Chart(document.getElementById('combChart'), {
+  type: 'line',
+  data: { labels: cap, datasets: [
+    { label: 'Total cost', data: log(total), rawData: total,
+      borderColor: '#534AB7', backgroundColor: '#534AB7',
+      borderWidth: 2.5, pointRadius: 0, tension: 0, fill: false },
+    { label: 'CAPEX', data: log(capex), rawData: capex,
+      borderColor: '#1D9E75', backgroundColor: '#1D9E75',
+      borderWidth: 1.5, borderDash: [6,4], pointRadius: 0, tension: 0, fill: false },
+    { label: 'Downtime cost', data: log(downtime), rawData: downtime,
+      borderColor: '#D85A30', backgroundColor: '#D85A30',
+      borderWidth: 1.5, borderDash: [2,3], pointRadius: 0, tension: 0, fill: false }
+  ]},
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: {
+        title: items => 'Capacity = ' + items[0].label,
+        label: c => c.dataset.label + ': ' + fmt(c.dataset.rawData[c.dataIndex])
+      }}},
+    scales: {
+      x: { title: { display: true, text: 'Warehouse capacity (spaces)' },
+           ticks: { autoSkip: true, maxTicksLimit: 20, maxRotation: 0 }},
+      y: { type: 'logarithmic',
+           title: { display: true, text: 'Annual cost (€, log scale)' },
+           ticks: { callback: v => v <= 1 ? '€0' : fmt(v) }}
+    }
+  },
+  plugins: [optimumLinePlugin]
+});
+</script>

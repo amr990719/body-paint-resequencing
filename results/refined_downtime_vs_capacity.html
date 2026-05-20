@@ -1,0 +1,40 @@
+<div style="position: relative; width: 100%; height: 380px;">
+  <canvas id="downChart" role="img" aria-label="Line chart of body-shop downtime cost versus warehouse capacity from 10 to 200 spaces, stepped by 2. Downtime collapses from 713.9 million euros at capacity 10 to zero at capacity 68, then stays at zero.">Downtime cost falls from 713.9M EUR at cap=10 to zero at cap=68.</canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const cap = [10,12,14,16,18,20,22,24,26,28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,78,80,82,84,86,88,90,92,94,96,98,100,102,104,106,108,110,112,114,116,118,120,122,124,126,128,130,132,134,136,138,140,142,144,146,148,150,152,154,156,158,160,162,164,166,168,170,172,174,176,178,180,182,184,186,188,190,192,194,196,198,200];
+const downtime = [713910399,601722868,502376843,426238126,353330994,284036874,223203807,176282647,137949478,109799415,86429533,67229899,51038531,40178891,32970819,24748683,18308011,13351651,9734224,6486244,5347510,4783615,4278648,3530943,2663695,1848337,1364736,703883,5733,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+const plotData = downtime.map(v => v <= 0 ? 1 : v);
+
+const fmt = v => {
+  if (v >= 1e9) return '€' + (v/1e9).toFixed(2) + 'B';
+  if (v >= 1e6) return '€' + (v/1e6).toFixed(1) + 'M';
+  if (v >= 1e3) return '€' + (v/1e3).toFixed(0) + 'k';
+  return '€0';
+};
+
+new Chart(document.getElementById('downChart'), {
+  type: 'line',
+  data: { labels: cap, datasets: [{
+    label: 'Downtime cost', data: plotData, rawData: downtime,
+    borderColor: '#D85A30', backgroundColor: '#D85A30',
+    borderWidth: 2.5, pointRadius: 0, tension: 0, fill: false
+  }]},
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false },
+      tooltip: { callbacks: {
+        title: items => 'Capacity = ' + items[0].label,
+        label: c => 'Downtime: ' + fmt(c.dataset.rawData[c.dataIndex])
+      }}},
+    scales: {
+      x: { title: { display: true, text: 'Warehouse capacity (spaces)' },
+           ticks: { autoSkip: true, maxTicksLimit: 20, maxRotation: 0 }},
+      y: { type: 'logarithmic',
+           title: { display: true, text: 'Downtime cost (€, log scale)' },
+           ticks: { callback: v => v <= 1 ? '€0' : fmt(v) }}
+    }
+  }
+});
+</script>
