@@ -69,6 +69,7 @@ The model has two independent "engines" that meet only at the warehouse:
 
 The two engines communicate only through the shared `warehouse` list. Step by step:
 
+![model flowchart](results/model_flowchart.png)
 ```
 evBodyExit fires (a vehicle leaves the body shop)
         │
@@ -99,8 +100,6 @@ evBodyExit fires (a vehicle leaves the body shop)
 
 The body shop and warehouse are modeled in Java code; only the paint stage (`enterPaint → delayPaint → sinkPainted`) sits on the AnyLogic flowchart canvas. The single bridge between code and canvas is the call `enterPaint.take(v)` inside `releaseToPaint()`.
 
-
-![model flowchart](model_flowchart.png/total_cost_curve.png)
 ---
 
 ## 5. Input data (CSV files)
