@@ -100,6 +100,8 @@ evBodyExit fires (a vehicle leaves the body shop)
 
 The body shop and warehouse are modeled in Java code; only the paint stage (`enterPaint → delayPaint → sinkPainted`) sits on the AnyLogic flowchart canvas. The single bridge between code and canvas is the call `enterPaint.take(v)` inside `releaseToPaint()`.
 
+
+
 Main
 │
 ├── Data structures
@@ -154,6 +156,8 @@ Main
     └── totalCost
         ├── capexCost
         └── bodyDowntimeCost
+
+
 ---
 
 ## 5. Input data (CSV files)
