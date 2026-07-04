@@ -193,6 +193,38 @@ bodyExitEvents
             ├── bodyBlockedStartTime
             └── bodyBlockedMinutes
 ---
+## Simple mental model
+```
+Startup
+│
+├── Build vehicles
+│   ├── allVehicles
+│   └── vehiclesByVin
+│
+├── Build arrival timeline
+│   └── bodyExitEvents
+│
+└── Attach paint durations
+    └── Vehicle paint fields
+
+
+Simulation runtime
+│
+├── evBodyExit
+│   └── onBodyExit(v)
+│       ├── warehouse
+│       └── blockedAtBodyShop
+│
+└── releaseToPaint()
+    ├── selectVehicleForPaint()
+    │   └── chooses smallest plannedGlobalSeq
+    ├── admitBlockedVehicleIfPossible()
+    └── enterPaint.take(v)
+        └── delayPaint
+            ├── paintedCount++
+            ├── updateCosts()
+            └── releaseToPaint()
+```
 ```
 
 ## 5. Input data (CSV files)
