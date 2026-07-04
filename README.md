@@ -192,8 +192,10 @@ bodyExitEvents
             ├── blockedVehicleCount
             ├── bodyBlockedStartTime
             └── bodyBlockedMinutes
----
-## Simple mental model
+```
+
+## Simple Mental model
+
 ```
 Startup
 │
@@ -224,7 +226,6 @@ Simulation runtime
             ├── paintedCount++
             ├── updateCosts()
             └── releaseToPaint()
-```
 ```
 
 ## 5. Input data (CSV files)
