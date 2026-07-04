@@ -157,8 +157,43 @@ Main
         ├── capexCost
         └── bodyDowntimeCost
 ```
-
+## Main operational variable graph
+```
+bodyExitEvents
+│
+└── evBodyExit
+    │
+    └── onBodyExit(v)
+        │
+        ├── if warehouse has space
+        │   │
+        │   └── warehouse
+        │       │
+        │       └── releaseToPaint()
+        │           │
+        │           ├── selectVehicleForPaint()
+        │           │   └── uses v.plannedGlobalSeq
+        │           │
+        │           ├── warehouse.remove(v)
+        │           │
+        │           ├── admitBlockedVehicleIfPossible()
+        │           │   └── blockedAtBodyShop → warehouse
+        │           │
+        │           └── enterPaint.take(v)
+        │               └── delayPaint
+        │                   └── uses:
+        │                       ├── v.paintProcMin
+        │                       ├── v.paintChangeoverMin
+        │                       └── v.paintQualityHoldMin
+        │
+        └── if warehouse full
+            │
+            ├── blockedAtBodyShop
+            ├── blockedVehicleCount
+            ├── bodyBlockedStartTime
+            └── bodyBlockedMinutes
 ---
+```
 
 ## 5. Input data (CSV files)
 
