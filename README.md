@@ -100,6 +100,60 @@ evBodyExit fires (a vehicle leaves the body shop)
 
 The body shop and warehouse are modeled in Java code; only the paint stage (`enterPaint → delayPaint → sinkPainted`) sits on the AnyLogic flowchart canvas. The single bridge between code and canvas is the call `enterPaint.take(v)` inside `releaseToPaint()`.
 
+Main
+│
+├── Data structures
+│   │
+│   ├── allVehicles : ArrayList<Vehicle>
+│   │   └── Vehicle objects
+│   │       ├── vin
+│   │       ├── plannedGlobalSeq
+│   │       ├── bodyExitDate
+│   │       ├── paintProcMin
+│   │       ├── paintChangeoverMin
+│   │       ├── paintQualityHoldMin
+│   │       ├── warehouseEnterTime
+│   │       └── wasBlocked
+│   │
+│   ├── vehiclesByVin : HashMap<String, Vehicle>
+│   │   ├── key: VIN String
+│   │   └── value: Vehicle object
+│   │       └── same Vehicle object also stored in allVehicles
+│   │
+│   ├── bodyExitEvents : ArrayList<Vehicle>
+│   │   └── Vehicle objects sorted by bodyExitDate
+│   │
+│   ├── warehouse : ArrayList<Vehicle>
+│   │   └── Vehicles currently waiting between body and paint
+│   │
+│   └── blockedAtBodyShop : ArrayList<Vehicle>
+│       └── Vehicles waiting because warehouse is full
+│
+├── Cursor variables
+│   └── nextBodyExitIndex
+│       └── points to next Vehicle inside bodyExitEvents
+│
+├── KPI counters
+│   ├── paintedCount
+│   ├── blockedVehicleCount
+│   └── paintStarvedCount
+│
+├── Blocking-time variables
+│   ├── bodyBlockedStartTime
+│   └── bodyBlockedMinutes
+│
+└── Cost variables
+    ├── capexCost
+    │   ├── warehouseCapacity
+    │   └── parkingSpaceCost
+    │
+    ├── bodyDowntimeCost
+    │   ├── bodyBlockedMinutes
+    │   └── bodyDowntimeCostPerHour
+    │
+    └── totalCost
+        ├── capexCost
+        └── bodyDowntimeCost
 ---
 
 ## 5. Input data (CSV files)
